@@ -9,14 +9,49 @@ import numpy as np
 
 # form providers.cmems import CmemsOpendap
 
+
+def __copernicusmarine_datastore(dataset, username, password):
+    __author__ = "Copernicus Marine User Support Team"
+    __copyright__ = "(C) 2021 E.U. Copernicus Marine Service Information"
+    __credits__ = ["E.U. Copernicus Marine Service Information"]
+    __license__ = "MIT License - You must cite this source"
+    __version__ = "202104"
+    __maintainer__ = "D. Bazin, E. DiMedio, C. Giordan"
+    __email__ = "servicedesk dot cmems at mercator hyphen ocean dot eu"
+
+    from pydap.client import open_url
+    from pydap.cas.get_cookies import setup_session
+
+    cas_url = "https://cmems-cas.cls.fr/cas/login"
+    session = setup_session(cas_url, username, password)
+    session.cookies.set("CASTGC", session.cookies.get_dict()["CASTGC"])
+    database = ["my", "nrt"]
+    url = f"https://{database[0]}.cmems-du.eu/thredds/dodsC/{dataset}"
+
+    try:
+        data_store = xr.backends.PydapDataStore(open_url(url, session=session))
+    except:
+        url = f"https://{database[1]}.cmems-du.eu/thredds/dodsC/{dataset}"
+        data_store = xr.backends.PydapDataStore(open_url(url, session=session))
+    return data_store
+
+
 class CmemsOpendap:
     def __init__(
         self,
-        dataset_id: str,
+        dataset_id: str = None,
         username: str = None,
         password: str = None,
     ):
+        """Class to access CMEMS-dataset through Opendap service.
 
+        Args:
+            dataset_id (str): Id-name of the dataset. Defaults to None.
+            username (str, optional): Username to login in CMEMS service. Defaults to None.
+            password (str, optional): Password to login in CMEMS service. Defaults to None.
+        """
+        if dataset_id is None:
+            dataset_id = input("Enter dataset-id form CMEMS-Opendap service: ")
         if username is None:
             username = getpass("Enter your username: ")
         if password is None:
@@ -24,12 +59,14 @@ class CmemsOpendap:
 
         self.username = username
         self.password = password
+        self.dataset_id = dataset_id.lstrip().rstrip()
 
         # Connect to datastore
-        data_store = copernicusmarine_datastore(dataset_id, username, password)
+        data_store = __copernicusmarine_datastore(dataset_id, username, password)
         self.ds = xr.open_dataset(data_store)
-        print(f"\033[1;32m'{username}' is successfully connected to '{dataset_id}'. xarray-dataset is in 'your_instance.ds'\033[0;0m")
-
+        print(
+            f"\n\033[1;32m'{username}' is successfully connected to '{dataset_id}'\033[0;0m\n"
+        )
 
     def crop(
         self,
@@ -40,16 +77,28 @@ class CmemsOpendap:
         depths: slice(float) = None,
         method: str = "neareast_outside",
     ):
+        """Method to crop dataset in time and spatial coordinates. Also provides variable selection.
+
+        Args:
+            variables (list, optional): Variable names to be selected. Defaults to None.
+            times (slice, optional): Datetime range to be selected. Defaults to None.
+            longitudes (slice, optional): Longitudes range to be selected. Defaults to None.
+            latitudes (slice, optional): Latutudes range to be selected. Defaults to None.
+            depths (slice, optional): Depths range to be selected. Defaults to None.
+            method (str, optional): Method to make the coordinate selection. Defaults to "neareast_outside".
+        """
         # -----------------------------------------------------------------------
         # BUG - Repeted times! waiting response from cmems-service!
         # WORKARROUND - Check there are no repeted times, it there are drop them!
         if len(np.unique(self.ds.time.values)) != len(self.ds.time):
-            print("Repeated times founded! --> report to Elena: edimedio@mercator-ocean.eu")
+            print(
+                "\n\033[1;31mRepeated times founded! --> report to CMEMS - Elena: 'edimedio@mercator-ocean.eu'\033[0;0m\n"
+            )
             _, index = np.unique(self.ds["time"], return_index=True)
             self.ds = self.ds.isel(time=index)
         # -----------------------------------------------------------------------
 
-        # Modify coordinates to make the selection based on the method desired 
+        # Modify coordinates to make the selection based on the method desired
         if method == "neareast_outside":
             # Calculate your domain and add 1 maximum dt, dx, dy as an outside buffer
             if isinstance(times, slice):
@@ -106,10 +155,18 @@ class CmemsOpendap:
         # Make the selection of variables
         if variables is not None:
             self.ds = self.ds.get(variables)
-        
+
         self.ds.load()
 
     def to_netcdf(self, output_path: str, netcdf_format: str = None):
+        """Save data in netCDF files.
+        If the download exceded the maximum size allowed by CMEMS Opendap service,
+        the dataset is splited by day and saved in daily netCDF files.
+
+        Args:
+            output_path (str): path to the desired file.
+            netcdf_format (str, optional): to specify the specific netcdf format, check availables in xarray documentation. Defaults to None.
+        """
         output_path = os.path.abspath(output_path)
         try:
             self.ds.to_netcdf(output_path, format=netcdf_format)
@@ -118,44 +175,62 @@ class CmemsOpendap:
             output_dir = os.path.dirname(output_path)
             filename, file_ext = os.path.splitext(os.path.basename(output_path))
 
-            print("Too big to be saved in one file! Spliting files by days...")
+            print(
+                "\n\033Too big to be saved in one file!\033[0;0m\n Spliting files by days..."
+            )
             date, datasets = zip(*self.ds.groupby("time.date"))
             paths = [
                 f"{output_dir}/{filename}_{d}{file_ext}".replace("-", "") for d in date
             ]
             xr.save_mfdataset(datasets, paths, format=netcdf_format)
 
-def copernicusmarine_datastore(dataset, username, password):
-    __author__ = "Copernicus Marine User Support Team"
-    __copyright__ = "(C) 2021 E.U. Copernicus Marine Service Information"
-    __credits__ = ["E.U. Copernicus Marine Service Information"]
-    __license__ = "MIT License - You must cite this source"
-    __version__ = "202104"
-    __maintainer__ = "D. Bazin, E. DiMedio, C. Giordan"
-    __email__ = "servicedesk dot cmems at mercator hyphen ocean dot eu"
-
-    from pydap.client import open_url
-    from pydap.cas.get_cookies import setup_session
-
-    cas_url = "https://cmems-cas.cls.fr/cas/login"
-    session = setup_session(cas_url, username, password)
-    session.cookies.set("CASTGC", session.cookies.get_dict()["CASTGC"])
-    database = ["my", "nrt"]
-    url = f"https://{database[0]}.cmems-du.eu/thredds/dodsC/{dataset}"
-
-    try:
-        data_store = xr.backends.PydapDataStore(open_url(url, session=session))
-    except:
-        url = f"https://{database[1]}.cmems-du.eu/thredds/dodsC/{dataset}"
-        data_store = xr.backends.PydapDataStore(open_url(url, session=session))
-    return data_store
-
 
 if __name__ == "__main__":
 
-    # cmems_mod_glo_phy_anfc_merged-uv_PT1H-i
-    dataset_id = input("Enter dataset-id form CMEMS-Opendap service: ")
-    data = CmemsOpendap(dataset_id, "garagon", "wrHZeS5V")
+    data = CmemsOpendap()
     print(data.ds)
 
-    
+    # GLOBAL CURRENTS   --> cmems_mod_glo_phy_anfc_merged-uv_PT1H-i
+    #                   --> global-analysis-forecast-phy-001-024
+    #                   --> global-analysis-forecast-phy-001-024-3dinst-so
+    #                   --> global-analysis-forecast-phy-001-024-3dinst-thetao
+    #                   --> global-analysis-forecast-phy-001-024-3dinst-uovo
+    #                   --> global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh
+    #                   --> global-analysis-forecast-phy-001-024-monthly
+
+    # GLOBAL WAVES  --> global-analysis-forecast-wav-001-027
+
+    # -----------------------------------------------------------------------------------
+
+    # IBI CURRENTS  --> cmems_mod_ibi_phy_anfc_0.027deg-2D_PT15M-m
+    #               --> cmems_mod_ibi_phy_anfc_0.027deg-2D_PT1H-m
+    #               --> cmems_mod_ibi_phy_anfc_0.027deg-3D_P1D-m
+    #               --> cmems_mod_ibi_phy_anfc_0.027deg-3D_P1M-m
+    #               --> cmems_mod_ibi_phy_anfc_0.027deg-3D_PT1H-m
+
+    # IBI WAVES --> dataset-ibi-analysis-forecast-wav-005-005-hourly
+
+    # -----------------------------------------------------------------------------------
+
+    # MED CURRENTS  --> med-cmcc-cur-an-fc-d
+    #               --> med-cmcc-cur-an-fc-h
+    #               --> med-cmcc-cur-an-fc-hts
+    #               --> med-cmcc-cur-an-fc-m
+    #               --> med-cmcc-cur-an-fc-qm
+    #               --> med-cmcc-mld-an-fc-d
+    #               --> med-cmcc-mld-an-fc-hts
+    #               --> med-cmcc-mld-an-fc-m
+    #               --> med-cmcc-sal-an-fc-d
+    #               --> med-cmcc-sal-an-fc-h
+    #               --> med-cmcc-sal-an-fc-hts
+    #               --> med-cmcc-sal-an-fc-m
+    #               --> med-cmcc-ssh-an-fc-d
+    #               --> med-cmcc-ssh-an-fc-hts
+    #               --> med-cmcc-ssh-an-fc-m
+    #               --> med-cmcc-ssh-an-fc-qm
+    #               --> med-cmcc-tem-an-fc-d
+    #               --> med-cmcc-tem-an-fc-h
+    #               --> med-cmcc-tem-an-fc-hts
+    #               --> med-cmcc-tem-an-fc-m
+
+    # MED WAVES  --> med-hcmr-wav-an-fc-h
