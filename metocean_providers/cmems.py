@@ -49,6 +49,52 @@ class CmemsOpendap:
             dataset_id (str): Id-name of the dataset. Defaults to None.
             username (str, optional): Username to login in CMEMS service. Defaults to None.
             password (str, optional): Password to login in CMEMS service. Defaults to None.
+
+        Notes:
+            GLOBAL CURRENTS   --> cmems_mod_glo_phy_anfc_merged-uv_PT1H-i
+                              --> global-analysis-forecast-phy-001-024
+                              --> global-analysis-forecast-phy-001-024-3dinst-so
+                              --> global-analysis-forecast-phy-001-024-3dinst-thetao
+                              --> global-analysis-forecast-phy-001-024-3dinst-uovo
+                              --> global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh
+                              --> global-analysis-forecast-phy-001-024-monthly
+
+            GLOBAL WAVES  --> global-analysis-forecast-wav-001-027
+
+            -----------------------------------------------------------------------------------
+
+            IBI CURRENTS  --> cmems_mod_ibi_phy_anfc_0.027deg-2D_PT15M-m
+                          --> cmems_mod_ibi_phy_anfc_0.027deg-2D_PT1H-m
+                          --> cmems_mod_ibi_phy_anfc_0.027deg-3D_P1D-m
+                          --> cmems_mod_ibi_phy_anfc_0.027deg-3D_P1M-m
+                          --> cmems_mod_ibi_phy_anfc_0.027deg-3D_PT1H-m
+
+            IBI WAVES --> dataset-ibi-analysis-forecast-wav-005-005-hourly
+
+            -----------------------------------------------------------------------------------
+
+            MED CURRENTS  --> med-cmcc-cur-an-fc-d
+                          --> med-cmcc-cur-an-fc-h
+                          --> med-cmcc-cur-an-fc-hts
+                          --> med-cmcc-cur-an-fc-m
+                          --> med-cmcc-cur-an-fc-qm
+                          --> med-cmcc-mld-an-fc-d
+                          --> med-cmcc-mld-an-fc-hts
+                          --> med-cmcc-mld-an-fc-m
+                          --> med-cmcc-sal-an-fc-d
+                          --> med-cmcc-sal-an-fc-h
+                          --> med-cmcc-sal-an-fc-hts
+                          --> med-cmcc-sal-an-fc-m
+                          --> med-cmcc-ssh-an-fc-d
+                          --> med-cmcc-ssh-an-fc-hts
+                          --> med-cmcc-ssh-an-fc-m
+                          --> med-cmcc-ssh-an-fc-qm
+                          --> med-cmcc-tem-an-fc-d
+                          --> med-cmcc-tem-an-fc-h
+                          --> med-cmcc-tem-an-fc-hts
+                          --> med-cmcc-tem-an-fc-m
+
+
         """
         if dataset_id is None:
             dataset_id = input("Enter dataset-id form CMEMS-Opendap service: ")
