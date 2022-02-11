@@ -1,0 +1,25 @@
+name: metocean_providers
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - xarray
+  - netCDF4
+  - dask
+  - bottleneck
+  - lxml
+  - pydap
+  - scipy
+
+# DEV-PACKAGES
+  - python-dotenv
+  - flit
+  - pytest-cov
+  - pip
+  - pip-tools
+  - pre-commit
+  - coverage-badge
+  # - pip:
+  #   - git+https://github.com/IHCantabria/qualitas.downloader.git@v0.3.5 --install-option="--no-deps"
+  #   - git+https://github.com/IHCantabria/datahub.client.git@v0.9.2 --install-option="--no-deps"

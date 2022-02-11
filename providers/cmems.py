@@ -1,11 +1,11 @@
 """Access to CMEMS[https://marine.copernicus.eu/] datasets, 
 you will need to be registered and use your credentials"""
+
 import os
 import xarray as xr
 from getpass import getpass
-from datetime import datetime, timedelta
+from datetime import datetime
 import numpy as np
-import matplotlib.pyplot as plt
 
 # form providers.cmems import CmemsOpendap
 
@@ -28,6 +28,8 @@ class CmemsOpendap:
         # Connect to datastore
         data_store = copernicusmarine_datastore(dataset_id, username, password)
         self.ds = xr.open_dataset(data_store)
+        print(f"\033[1;32m'{username}' is successfully connected to '{dataset_id}'. xarray-dataset is in 'your_instance.ds'\033[0;0m")
+
 
     def crop(
         self,
@@ -38,13 +40,14 @@ class CmemsOpendap:
         depths: slice(float) = None,
         method: str = "neareast_outside",
     ):
-        # # -----------------------------------------------------------------------
-        # # BUG - Repeted times! waiting response from cmems-service!
-        # # WORKARROUND - Check there are no repeted times, it there are drop them!
-        # if len(np.unique(self.ds.time.values)) != len(self.ds.time):
-        #     _, index = np.unique(self.ds["time"], return_index=True)
-        #     self.ds = self.ds.isel(time=index)
-        # # -----------------------------------------------------------------------
+        # -----------------------------------------------------------------------
+        # BUG - Repeted times! waiting response from cmems-service!
+        # WORKARROUND - Check there are no repeted times, it there are drop them!
+        if len(np.unique(self.ds.time.values)) != len(self.ds.time):
+            print("Repeated times founded! --> report to Elena: edimedio@mercator-ocean.eu")
+            _, index = np.unique(self.ds["time"], return_index=True)
+            self.ds = self.ds.isel(time=index)
+        # -----------------------------------------------------------------------
 
         # Modify coordinates to make the selection based on the method desired 
         if method == "neareast_outside":
@@ -150,33 +153,9 @@ def copernicusmarine_datastore(dataset, username, password):
 
 if __name__ == "__main__":
 
-    dataset_id = "cmems_mod_glo_phy_anfc_merged-uv_PT1H-i"
-    username = "garagon"
-    password = "wrHZeS5V"
+    # cmems_mod_glo_phy_anfc_merged-uv_PT1H-i
+    dataset_id = input("Enter dataset-id form CMEMS-Opendap service: ")
+    data = CmemsOpendap(dataset_id, "garagon", "wrHZeS5V")
+    print(data.ds)
 
-    # MAP: Cantabrian_sea last 3 days
-    t0 = datetime.utcnow().replace(minute=0, second=0, microsecond=0)
-    times = slice(t0, t0 + timedelta(days=3))
-    longitudes = slice(-10, -0.5)
-    latitudes = slice(42.5, 45)
-    
-    data = CmemsOpendap(dataset_id, username, password)
-    data.crop(times=times, longitudes=longitudes, latitudes=latitudes)
-    # data.to_netcdf("test_map.nc")
-
-    # del data
-
-    # # POINT: Cantabrian_sea at day 3 from now
-    # t0 = datetime.utcnow().replace(minute=0, second=0, microsecond=0)
-    # times = slice(t0, t0 + timedelta(days=10))
-    # longitudes = -5
-    # latitudes = 43.5
-
-    # global_data = CmemsOpendap(dataset_id, username, password)
-    # global_data.crop(times=times, longitudes=longitudes, latitudes=latitudes)
-    # # data.to_netcdf("test_point.nc")
-
-    # dataset_id = "cmems_mod_ibi_phy_anfc_0.027deg-2D_PT1H-m"
-    # regional_data = CmemsOpendap(dataset_id, username, password)
-    # regional_data.crop(times=times, longitudes=longitudes, latitudes=latitudes)
     
