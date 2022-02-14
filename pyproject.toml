@@ -19,7 +19,7 @@ Home = "https://github.com/aragong/metoceanproviders"
 
 [project.optional-dependencies]
 dev = [
-    "flit"
+    "flit",
     "python-dotenv",
     "pytest-cov",
     "pip",
