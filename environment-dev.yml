@@ -16,7 +16,6 @@ dependencies:
   - python-dotenv
   - flit
   - pytest-cov
-  - pip
   - pip-tools
   - pre-commit
   - coverage-badge
