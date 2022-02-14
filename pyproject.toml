@@ -11,7 +11,7 @@ classifiers = ["License :: OSI Approved :: GNU General Public License v3 or late
 dynamic = ["version", "description"]
 dependencies = [
     "lxml",
-    "python-dotenv",
+    "python-dotenv[cli]",
     "xarray[io]",
 ]
 
@@ -21,7 +21,7 @@ Home = "https://github.com/aragong/metoceanproviders"
 [project.optional-dependencies]
 dev = [
     "flit",
-    "python-dotenv",
+    "python-dotenv[cli]",
     "pytest-cov",
     "pip",
     "pip-tools",
