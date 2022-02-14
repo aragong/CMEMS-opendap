@@ -19,12 +19,12 @@ Home = "https://github.com/aragong/metoceanproviders"
 
 [project.optional-dependencies]
 dev = [
-  "flit"
-  "python-dotenv",
-  "pytest-cov",
-  "pip",
-  "pip-tools",
-  "pre-commit",
-  "coverage-badge",
+    "flit"
+    "python-dotenv",
+    "pytest-cov",
+    "pip",
+    "pip-tools",
+    "pre-commit",
+    "coverage-badge",
 ]
 
