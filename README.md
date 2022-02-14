@@ -1,4 +1,4 @@
-# :package: Met-ocean providers
+# Met-ocean providers
 ![GitHub top language](https://img.shields.io/github/languages/top/aragong/metoceanproviders?style=plastic)
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/aragong/metoceanproviders?label=latest%20tag&style=plastic)
 ![GitHub repo size](https://img.shields.io/github/repo-size/aragong/metoceanproviders?style=plastic)
@@ -26,7 +26,7 @@ data = cmems.Opendap(dataset_id, username, password)
 
 data.ds # To visualize connected xarray dataset.
 data.crop(varaibles, times, longitudes, latitudes) # To crop dataset.
-datato_netcdf(output_path) # To download to NetCDF-file.
+data.to_netcdf(output_path) # To download to NetCDF-file.
 ```
 
 ---
