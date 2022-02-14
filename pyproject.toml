@@ -9,12 +9,21 @@ readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"]
 dynamic = ["version", "description"]
+dependencies = [
+    "xarray[io]",
+    "xlm",
+]
 
 [project.urls]
 Home = "https://github.com/aragong/MetOceanProviders"
 
-[dependencies]
-dependencies = [
-    "lxml",
-    "xarray[io]"
+[project.optional-dependencies]
+dev = [
+  "python-dotenv",
+  "flit",
+  "pytest-cov",
+  "pip",
+  "pip-tools",
+  "pre-commit",
+  "coverage-badge",
 ]
