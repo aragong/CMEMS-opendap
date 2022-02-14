@@ -9,7 +9,7 @@ import numpy as np
 import xarray as xr
 
 
-class CmemsOpendap:
+class Opendap:
     def __init__(
         self,
         dataset_id: str = None,
@@ -236,5 +236,5 @@ class CmemsOpendap:
 
 if __name__ == "__main__":
 
-    data = CmemsOpendap()
+    data = Opendap()
     print(data.ds)

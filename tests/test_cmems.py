@@ -1,11 +1,12 @@
 import os
+import shutil
 import unittest
 
 import pandas as pd
 import xarray as xr
 from datetime import datetime, timedelta
 
-from metocean_providers.cmems import CmemsOpendap
+from metocean_providers.cmems import Opendap
 
 
 class TestCmems(unittest.TestCase):
@@ -13,8 +14,13 @@ class TestCmems(unittest.TestCase):
     def setUpClass(self):
         pass
 
+    @classmethod
+    def tearDownClass(cls) -> None:
+        if os.path.exists("tmp"):
+            shutil.rmtree("tmp")
+
     def setUp(self) -> None:
-        self.data = CmemsOpendap(
+        self.data = Opendap(
             "cmems_mod_glo_phy_anfc_merged-uv_PT1H-i", "garagon", "wrHZeS5V"
         )
 
@@ -52,7 +58,7 @@ class TestCmems(unittest.TestCase):
     def test_to_netcdf(self):
         # 5-day forecast
         t0 = datetime.utcnow()
-        times = slice(t0, t0 + timedelta(days=5))
+        times = slice(t0, t0 + timedelta(days=2))
 
         self.data.crop(None, times, None, None)
 

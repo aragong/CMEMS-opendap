@@ -1,0 +1,2 @@
+xarray[complete]
+# BUG: pip-compile in conda py3.10 raise error! 

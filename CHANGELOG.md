@@ -1,9 +1,8 @@
 
-
-# v0.1.0 - 11/02/2022
+# v0.1.0 - 14/02/2022
 ### Added:
 1) Create package
-2) CMEMS opendap service `class CmemsOpendap`
+2) CMEMS opendap service @ `metocean_providers.cmems.Opendap`
 ### Changed:
 ### Fixed:
 
