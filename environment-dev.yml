@@ -1,4 +1,4 @@
-name: metocean_providers
+name: metoceanproviders
 channels:
   - conda-forge
   - defaults
