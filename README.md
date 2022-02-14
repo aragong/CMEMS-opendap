@@ -13,7 +13,7 @@ Python package to access main open-access MetOcean products (Forecast, Reanalysi
 
 ## :house: Installation
 ```
-pip install git+ssh://git@github.com/aragong/qualitas.downloader.git@v0.1.0
+pip install git+ssh://git@github.com/aragong/MetOceanProviders.git@v0.1.0
 ```
 
 ---
