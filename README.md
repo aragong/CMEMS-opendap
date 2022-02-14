@@ -14,7 +14,7 @@ Python package to access main open-access met-ocean products (Forecast, Reanalys
 ```bash
 pip install git+ssh://git@github.com/aragong/metoceanproviders.git@v0.1.0
 
-# Declare CMEMS_USERNAME and CMEMS_PASSWORD variables
+# Declare CMEMS_USERNAME and CMEMS_PASSWORD variables inside your .env file
 dotenv set CMEMS_USERNAME your_cmems_username
 dotenv set CMEMS_PASSWORD your_cmems_password
 ```
