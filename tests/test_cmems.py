@@ -6,7 +6,7 @@ import pandas as pd
 import xarray as xr
 from datetime import datetime, timedelta
 
-from metocean_providers.cmems import Opendap
+from metoceanproviders.cmems import Opendap
 
 
 class TestCmems(unittest.TestCase):

@@ -20,10 +20,10 @@ pip install git+ssh://git@github.com/aragong/MetOceanProviders.git@v0.1.0
 ## :zap: Get Started
 
 ```python
-import metocean_providers as mop
+import metoceanproviders.cmems as cmems
 
 # EXAMPLE for accessing CMEMS opendap products
-data = mop.cmems.Opendap(dataset_id, username, password)
+data = cmems.Opendap("cmems_mod_glo_phy_anfc_merged-uv_PT1H-i", "garagon", "wrHZeS5V")
 
 data.ds # To visualize connected xarray dataset.
 data.crop(varaibles, times, longitudes, latitudes, depths) # To crop dataset.
