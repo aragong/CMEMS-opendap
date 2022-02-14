@@ -9,7 +9,6 @@ Python package to access main open-access MetOcean products (Forecast, Reanalysi
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/aragong/MetOceanProviders)
-![CI](https://github.com/aragong/MetOceanProviders/actions/workflows/main.yml/badge.svg)
 ![Coverage](coverage.svg)
 
 ## :house: Installation
