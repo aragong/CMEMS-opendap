@@ -1,0 +1,13 @@
+name: metoceanproviders
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - xarray
+  - netCDF4
+  - dask
+  - bottleneck
+  - lxml
+  - pydap
+  - scipy

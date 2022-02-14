@@ -7,21 +7,23 @@ import xarray as xr
 from datetime import datetime, timedelta
 
 from metoceanproviders.cmems import Opendap
+from metoceanproviders import config as cfg
 
 
 class TestCmems(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         pass
-
+    
     @classmethod
     def tearDownClass(cls) -> None:
         if os.path.exists("tmp"):
             shutil.rmtree("tmp")
 
     def setUp(self) -> None:
+        
         self.data = Opendap(
-            "cmems_mod_glo_phy_anfc_merged-uv_PT1H-i", "garagon", "wrHZeS5V"
+            "cmems_mod_glo_phy_anfc_merged-uv_PT1H-i", cfg.CMEMS_USERNAME, cfg.CMEMS_PASSWORD
         )
 
     def tearDown(self) -> None:

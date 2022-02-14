@@ -8,13 +8,14 @@ from getpass import getpass
 import numpy as np
 import xarray as xr
 
+from metoceanproviders import config as cfg
 
 class Opendap:
     def __init__(
         self,
         dataset_id: str = None,
-        username: str = None,
-        password: str = None,
+        username: str = cfg.CMEMS_USERNAME,
+        password: str = cfg.CMEMS_PASSWORD,
     ):
         """Class to access CMEMS-dataset through Opendap service.
 
