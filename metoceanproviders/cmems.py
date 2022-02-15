@@ -10,6 +10,15 @@ import xarray as xr
 
 from metoceanproviders import config as cfg
 
+class CredentialsError(Exception):
+    """Custom error for incorrect credentials"""
+
+    def __init__(self, username: str, password: str,  message: str):
+        self.username = username
+        self.password = password
+        self.message = message
+        super().__init__(message)
+
 class Opendap:
     def __init__(
         self,
@@ -70,23 +79,36 @@ class Opendap:
 
 
         """
-        if dataset_id is None:
-            dataset_id = input("Enter dataset-id form CMEMS-Opendap service: ")
-        if username is None:
-            username = getpass("Enter your username: ")
-        if password is None:
-            password = getpass("Enter your password: ")
-
+        
         self.username = username
         self.password = password
         self.dataset_id = dataset_id.lstrip().rstrip()
 
+        if not self.dataset_id:
+            self.dataset_id = input("Enter dataset-id form CMEMS-Opendap service: ")
+        if not self.username:
+            self.username = getpass("Enter your username: ")
+        if not self.password:
+            self.password = getpass("Enter your password: ")
+
+
         # Connect to datastore
-        data_store = self.__copernicusmarine_datastore(dataset_id, username, password)
+        data_store = self._copernicusmarine_datastore(dataset_id, username, password)
         self.ds = xr.open_dataset(data_store)
         print(
             f"\n\033[1;32m'{username}' is successfully connected to '{dataset_id}'\033[0;0m\n"
         )
+        
+        # -----------------------------------------------------------------------
+        # BUG - Repeted times! waiting response from cmems-service!
+        # WORKARROUND - Check there are no repeted times, it there are drop them!
+        if len(np.unique(self.ds.time.values)) != len(self.ds.time):
+            print(
+                "\n\033[1;31mRepeated times founded! --> report to CMEMS - Elena: 'edimedio@mercator-ocean.eu'\033[0;0m\n"
+            )
+            _, index = np.unique(self.ds["time"], return_index=True)
+            self.ds = self.ds.isel(time=index)
+        # -----------------------------------------------------------------------
 
     def crop(
         self,
@@ -107,16 +129,6 @@ class Opendap:
             depths (slice, optional): Depths range to be selected. Defaults to None.
             method (str, optional): Method to make the coordinate selection. Defaults to "neareast_outside".
         """
-        # -----------------------------------------------------------------------
-        # BUG - Repeted times! waiting response from cmems-service!
-        # WORKARROUND - Check there are no repeted times, it there are drop them!
-        if len(np.unique(self.ds.time.values)) != len(self.ds.time):
-            print(
-                "\n\033[1;31mRepeated times founded! --> report to CMEMS - Elena: 'edimedio@mercator-ocean.eu'\033[0;0m\n"
-            )
-            _, index = np.unique(self.ds["time"], return_index=True)
-            self.ds = self.ds.isel(time=index)
-        # -----------------------------------------------------------------------
 
         # Modify coordinates to make the selection based on the method desired
         if method == "neareast_outside":
@@ -178,7 +190,7 @@ class Opendap:
         try:
             self.ds.load()
         except:
-            print("\n\033Too big to be loaded in one request!\033[0;0m\n")
+            print("\n\033[1;33mToo big to be loaded in one request!\033[0;0m\n")
 
     def to_netcdf(self, output_path: str, netcdf_format: str = None):
         """Save data in netCDF files.
@@ -209,7 +221,7 @@ class Opendap:
 
         return paths
 
-    def __copernicusmarine_datastore(self, dataset, username, password):
+    def _copernicusmarine_datastore(self, dataset, username, password):
         __author__ = "Copernicus Marine User Support Team"
         __copyright__ = "(C) 2021 E.U. Copernicus Marine Service Information"
         __credits__ = ["E.U. Copernicus Marine Service Information"]
@@ -223,7 +235,14 @@ class Opendap:
 
         cas_url = "https://cmems-cas.cls.fr/cas/login"
         session = setup_session(cas_url, username, password)
-        session.cookies.set("CASTGC", session.cookies.get_dict()["CASTGC"])
+        try:
+            session.cookies.set("CASTGC", session.cookies.get_dict()["CASTGC"])
+        except:
+            raise CredentialsError(
+                username, password,
+                message = f"\n\033[1;31mUsername ({username}) or/and password are incorrect!\033[0;0m\n"
+            )
+            
         database = ["my", "nrt"]
         url = f"https://{database[0]}.cmems-du.eu/thredds/dodsC/{dataset}"
 
