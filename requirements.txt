@@ -36,6 +36,7 @@ click==8.0.3
     #   cfgrib
     #   click-plugins
     #   cligj
+    #   python-dotenv
     #   rasterio
 click-plugins==1.1.1
     # via rasterio
@@ -101,6 +102,8 @@ pyparsing==3.0.7
     #   snuggs
 python-dateutil==2.8.2
     # via pandas
+python-dotenv[cli]==0.19.2
+    # via -r requirements.in
 pytz==2021.3
     # via pandas
 rasterio==1.2.10
