@@ -30,3 +30,8 @@ dev = [
     "coverage-badge",
 ]
 
+[tool.pytest.ini_options]
+addopts = "-v -m 'not slow'"
+markers = [
+    "slow"
+]

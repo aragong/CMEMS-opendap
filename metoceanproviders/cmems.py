@@ -19,7 +19,38 @@ class CredentialsError(Exception):
         self.message = message
         super().__init__(message)
 
-class Opendap:
+
+def _copernicusmarine_datastore(dataset, username, password):
+    __author__ = "Copernicus Marine User Support Team"
+    __copyright__ = "(C) 2021 E.U. Copernicus Marine Service Information"
+    __credits__ = ["E.U. Copernicus Marine Service Information"]
+    __license__ = "MIT License - You must cite this source"
+    __version__ = "202104"
+    __maintainer__ = "D. Bazin, E. DiMedio, C. Giordan"
+    __email__ = "servicedesk dot cmems at mercator hyphen ocean dot eu"
+    from pydap.cas.get_cookies import setup_session
+    from pydap.client import open_url
+    cas_url = "https://cmems-cas.cls.fr/cas/login"
+    session = setup_session(cas_url, username, password)
+    try:
+        session.cookies.set("CASTGC", session.cookies.get_dict()["CASTGC"])
+    except:
+        raise CredentialsError(
+            username=username, password=password, message=f"\n\033[1;31mUsername or/and password are incorrect!\033[0;0m\n"
+        )
+        
+    database = ["my", "nrt"]
+    url = f"https://{database[0]}.cmems-du.eu/thredds/dodsC/{dataset}"
+    try:
+        data_store = xr.backends.PydapDataStore(open_url(url, session=session))
+    except:
+        url = f"https://{database[1]}.cmems-du.eu/thredds/dodsC/{dataset}"
+        data_store = xr.backends.PydapDataStore(open_url(url, session=session))
+    return data_store
+
+
+class Opendap:   
+
     def __init__(
         self,
         dataset_id: str = None,
@@ -84,16 +115,16 @@ class Opendap:
         self.password = password
         self.dataset_id = dataset_id.lstrip().rstrip()
 
-        if not self.dataset_id:
-            self.dataset_id = input("Enter dataset-id form CMEMS-Opendap service: ")
-        if not self.username:
-            self.username = getpass("Enter your username: ")
-        if not self.password:
-            self.password = getpass("Enter your password: ")
+        # if not self.dataset_id:
+        #     self.dataset_id = input("Enter dataset-id form CMEMS-Opendap service: ")
+        # if not self.username:
+        #     self.username = getpass("Enter your username: ")
+        # if not self.password:
+        #     self.password = getpass("Enter your password: ")
 
 
         # Connect to datastore
-        data_store = self._copernicusmarine_datastore(dataset_id, username, password)
+        data_store = _copernicusmarine_datastore(dataset_id, username, password)
         self.ds = xr.open_dataset(data_store)
         print(
             f"\n\033[1;32m'{username}' is successfully connected to '{dataset_id}'\033[0;0m\n"
@@ -201,7 +232,7 @@ class Opendap:
             output_path (str): path to the desired file.
             netcdf_format (str, optional): to specify the specific netcdf format, check availables in xarray documentation. Defaults to None.
         """
-        output_path = os.path.abspath(output_path)
+        # output_path = os.path.abspath(output_path) #BUG delete hyphons
         try:
             self.ds.to_netcdf(output_path, format=netcdf_format)
 
@@ -215,43 +246,12 @@ class Opendap:
 
         date, datasets = zip(*self.ds.groupby("time.date"))
         paths = [
-            f"{output_dir}/{filename}_{d}{file_ext}".replace("-", "") for d in date
+            f"{output_dir}/{filename}_{d}{file_ext}" for d in date
         ]
         xr.save_mfdataset(datasets, paths, format=netcdf_format)
 
         return paths
 
-    def _copernicusmarine_datastore(self, dataset, username, password):
-        __author__ = "Copernicus Marine User Support Team"
-        __copyright__ = "(C) 2021 E.U. Copernicus Marine Service Information"
-        __credits__ = ["E.U. Copernicus Marine Service Information"]
-        __license__ = "MIT License - You must cite this source"
-        __version__ = "202104"
-        __maintainer__ = "D. Bazin, E. DiMedio, C. Giordan"
-        __email__ = "servicedesk dot cmems at mercator hyphen ocean dot eu"
-
-        from pydap.cas.get_cookies import setup_session
-        from pydap.client import open_url
-
-        cas_url = "https://cmems-cas.cls.fr/cas/login"
-        session = setup_session(cas_url, username, password)
-        try:
-            session.cookies.set("CASTGC", session.cookies.get_dict()["CASTGC"])
-        except:
-            raise CredentialsError(
-                username, password,
-                message = f"\n\033[1;31mUsername ({username}) or/and password are incorrect!\033[0;0m\n"
-            )
-            
-        database = ["my", "nrt"]
-        url = f"https://{database[0]}.cmems-du.eu/thredds/dodsC/{dataset}"
-
-        try:
-            data_store = xr.backends.PydapDataStore(open_url(url, session=session))
-        except:
-            url = f"https://{database[1]}.cmems-du.eu/thredds/dodsC/{dataset}"
-            data_store = xr.backends.PydapDataStore(open_url(url, session=session))
-        return data_store
 
 
 if __name__ == "__main__":
