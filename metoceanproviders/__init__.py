@@ -6,7 +6,7 @@ __credits__ = ["German Aragón Caminero"]
 __license__ = "GNU General Public License, Version 3"
 __maintainer__ = "German Aragon"
 __email__ = "german dot aragon at ihcantabria dot com"
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 import os
 
