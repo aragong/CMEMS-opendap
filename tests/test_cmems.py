@@ -5,26 +5,34 @@ import pandas as pd
 import pytest
 import xarray as xr
 from metoceanproviders import config as cfg
-from metoceanproviders.cmems import (CredentialsError, Opendap,
-                                     _copernicusmarine_datastore)
+from metoceanproviders.cmems import (
+    CredentialsError,
+    Opendap,
+    _copernicusmarine_datastore,
+)
 
 
 class TestLogin:
     def test_login_fail(self):
         with pytest.raises(CredentialsError) as e_info:
-            _copernicusmarine_datastore("cmems_mod_glo_phy_anfc_merged-uv_PT1H-i", "fakeuser", "fakepass")
-    
+            _copernicusmarine_datastore(
+                "cmems_mod_glo_phy_anfc_merged-uv_PT1H-i", "fakeuser", "fakepass"
+            )
+
     def test_login_none(self):
         with pytest.raises(CredentialsError) as e_info:
-            _copernicusmarine_datastore("cmems_mod_glo_phy_anfc_merged-uv_PT1H-i", None, None)
+            _copernicusmarine_datastore(
+                "cmems_mod_glo_phy_anfc_merged-uv_PT1H-i", None, None
+            )
+
 
 credentials = pytest.mark.skipif(
-        None in [cfg.CMEMS_USERNAME, cfg.CMEMS_PASSWORD], 
-        reason="\n\033[1;31m'CMEMS_USERNAME' and 'CMEMS_PASSWORD' environment variables are not defined. See Installation in README.md.\033[0;0m\n"
-    )
+    None in [cfg.CMEMS_USERNAME, cfg.CMEMS_PASSWORD],
+    reason="\n\033[1;31m'CMEMS_USERNAME' and 'CMEMS_PASSWORD' environment variables are not defined. See Installation in README.md.\033[0;0m\n",
+)
+
 
 class TestOpendap:
-    
     @pytest.fixture(scope="class")
     def times(self):
         t0 = datetime.utcnow()
@@ -57,7 +65,6 @@ class TestOpendap:
         assert data.ds.latitude.values.min() <= latitudes.start
         assert data.ds.latitude.values.max() >= latitudes.stop
 
-
     @credentials
     def test_download(self, tmpdir, data):
         if not os.path.exists(tmpdir):
@@ -66,7 +73,7 @@ class TestOpendap:
         paths = data.to_netcdf(output_path)
         ds = xr.open_mfdataset(paths)
         assert ds == data.ds
-    
+
     @credentials
     def test_download_multiple(self, tmpdir, data):
         if not os.path.exists(tmpdir):
@@ -75,4 +82,3 @@ class TestOpendap:
         paths = data._to_daily_netcdf(output_path)
         ds = xr.open_mfdataset(paths)
         assert ds == data.ds
-

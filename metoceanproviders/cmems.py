@@ -118,12 +118,12 @@ class Opendap:
         self.password = password
         self.dataset_id = dataset_id.lstrip().rstrip()
 
-        # if not self.dataset_id:
-        #     self.dataset_id = input("Enter dataset-id form CMEMS-Opendap service: ")
-        # if not self.username:
-        #     self.username = getpass("Enter your username: ")
-        # if not self.password:
-        #     self.password = getpass("Enter your password: ")
+        if not self.dataset_id:
+            self.dataset_id = input("Enter dataset-id form CMEMS-Opendap service: ")
+        if not self.username:
+            self.username = getpass("Enter your username: ")
+        if not self.password:
+            self.password = getpass("Enter your password: ")
 
         # Connect to datastore
         data_store = _copernicusmarine_datastore(dataset_id, username, password)
