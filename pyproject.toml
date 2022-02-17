@@ -31,7 +31,10 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "-v -m 'not slow'"
+addopts = [
+    "-v", 
+    "-m not slow"
+]
 markers = [
     "slow"
 ]

@@ -235,12 +235,14 @@ class Opendap:
         # output_path = os.path.abspath(output_path) #BUG delete hyphons
         try:
             self.ds.to_netcdf(output_path, format=netcdf_format)
-
+            paths = list()
+            paths.append(output_path)
         except:
-            paths = self.to_daily_netcdf(output_path, netcdf_format)
-            output_path = paths
+            paths = self._to_daily_netcdf(output_path, netcdf_format)
+        
+        return paths
 
-    def to_daily_netcdf(self, output_path, netcdf_format):
+    def _to_daily_netcdf(self, output_path, netcdf_format=None):
         output_dir = os.path.dirname(output_path)
         filename, file_ext = os.path.splitext(os.path.basename(output_path))
 
