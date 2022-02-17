@@ -10,10 +10,11 @@ import xarray as xr
 
 from metoceanproviders import config as cfg
 
+
 class CredentialsError(Exception):
     """Custom error for incorrect credentials"""
 
-    def __init__(self, username: str, password: str,  message: str):
+    def __init__(self, username: str, password: str, message: str):
         self.username = username
         self.password = password
         self.message = message
@@ -30,15 +31,18 @@ def _copernicusmarine_datastore(dataset, username, password):
     __email__ = "servicedesk dot cmems at mercator hyphen ocean dot eu"
     from pydap.cas.get_cookies import setup_session
     from pydap.client import open_url
+
     cas_url = "https://cmems-cas.cls.fr/cas/login"
     session = setup_session(cas_url, username, password)
     try:
         session.cookies.set("CASTGC", session.cookies.get_dict()["CASTGC"])
     except:
         raise CredentialsError(
-            username=username, password=password, message=f"\n\033[1;31mUsername or/and password are incorrect!\033[0;0m\n"
+            username=username,
+            password=password,
+            message=f"\n\033[1;31mUsername or/and password are incorrect!\033[0;0m\n",
         )
-        
+
     database = ["my", "nrt"]
     url = f"https://{database[0]}.cmems-du.eu/thredds/dodsC/{dataset}"
     try:
@@ -49,8 +53,7 @@ def _copernicusmarine_datastore(dataset, username, password):
     return data_store
 
 
-class Opendap:   
-
+class Opendap:
     def __init__(
         self,
         dataset_id: str = None,
@@ -110,7 +113,7 @@ class Opendap:
 
 
         """
-        
+
         self.username = username
         self.password = password
         self.dataset_id = dataset_id.lstrip().rstrip()
@@ -122,14 +125,13 @@ class Opendap:
         # if not self.password:
         #     self.password = getpass("Enter your password: ")
 
-
         # Connect to datastore
         data_store = _copernicusmarine_datastore(dataset_id, username, password)
         self.ds = xr.open_dataset(data_store)
         print(
             f"\n\033[1;32m'{username}' is successfully connected to '{dataset_id}'\033[0;0m\n"
         )
-        
+
         # -----------------------------------------------------------------------
         # BUG - Repeted times! waiting response from cmems-service!
         # WORKARROUND - Check there are no repeted times, it there are drop them!
@@ -239,7 +241,7 @@ class Opendap:
             paths.append(output_path)
         except:
             paths = self._to_daily_netcdf(output_path, netcdf_format)
-        
+
         return paths
 
     def _to_daily_netcdf(self, output_path, netcdf_format=None):
@@ -247,13 +249,10 @@ class Opendap:
         filename, file_ext = os.path.splitext(os.path.basename(output_path))
 
         date, datasets = zip(*self.ds.groupby("time.date"))
-        paths = [
-            f"{output_dir}/{filename}_{d}{file_ext}" for d in date
-        ]
+        paths = [f"{output_dir}/{filename}_{d}{file_ext}" for d in date]
         xr.save_mfdataset(datasets, paths, format=netcdf_format)
 
         return paths
-
 
 
 if __name__ == "__main__":
