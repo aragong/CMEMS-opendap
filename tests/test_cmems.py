@@ -7,7 +7,7 @@ import xarray as xr
 from metoceanproviders import config as cfg
 from metoceanproviders.cmems import (
     CredentialsError,
-    Opendap,
+    CmemsOpendap,
     _copernicusmarine_datastore,
 )
 
@@ -48,7 +48,7 @@ class TestOpendap:
 
     @pytest.fixture(scope="class")
     def data(self, times, longitudes, latitudes):
-        data = Opendap("cmems_mod_glo_phy_anfc_merged-uv_PT1H-i")
+        data = CmemsOpendap("cmems_mod_glo_phy_anfc_merged-uv_PT1H-i")
         data.crop(None, times, longitudes, latitudes)
         return data
 

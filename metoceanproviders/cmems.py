@@ -53,7 +53,7 @@ def _copernicusmarine_datastore(dataset, username, password):
     return data_store
 
 
-class Opendap:
+class CmemsOpendap:
     def __init__(
         self,
         dataset_id: str = None,
@@ -257,5 +257,5 @@ class Opendap:
 
 if __name__ == "__main__":
 
-    data = Opendap()
+    data = CmemsOpendap()
     print(data.ds)

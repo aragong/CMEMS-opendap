@@ -12,7 +12,7 @@ import os
 
 from dotenv import load_dotenv
 
-from metoceanproviders import cmems
+from .cmems import CmemsOpendap
 
 
 dotenv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
