@@ -12,7 +12,7 @@ import os
 
 from dotenv import load_dotenv
 
-from .cmems import CmemsOpendap
+from .cmems import CmemsOpendap, cmems_catalog
 
 
 dotenv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
