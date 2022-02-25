@@ -254,6 +254,12 @@ class CmemsOpendap:
             self.ds = self.ds.isel(time=index)
         # -----------------------------------------------------------------------
 
+        # STANDARIZE COORDINATES:
+        if "lon" in data.ds.coords:
+            data.ds = data.ds.rename({"lon": "longitude"})
+        if "lat" in data.ds.coords:
+            data.ds = data.ds.rename({"lat": "latitude"})
+
     def crop(
         self,
         variables: list = None,
