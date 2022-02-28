@@ -9,127 +9,7 @@ import numpy as np
 import xarray as xr
 
 from metoceanproviders import config as cfg
-
-
-class CredentialsError(Exception):
-    """Custom error for incorrect credentials"""
-
-    def __init__(self, username: str, password: str, message: str):
-        self.username = username
-        self.password = password
-        self.message = message
-        super().__init__(message)
-
-
-# CMEMS' dataset-id list at 22/02/2022
-cmems_catalog = {
-    "global": {
-        "physics": [
-            "cmems_mod_glo_phy_anfc_merged-uv_PT1H-i",
-            "global-analysis-forecast-phy-001-024",
-            "global-analysis-forecast-phy-001-024-3dinst-so",
-            "global-analysis-forecast-phy-001-024-3dinst-thetao",
-            "global-analysis-forecast-phy-001-024-3dinst-uovo",
-            "global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh",
-            "global-analysis-forecast-phy-001-024-monthly",
-        ],
-        "waves": ["global-analysis-forecast-wav-001-072"],
-    },
-    "ibi": {
-        "physics": [
-            "cmems_mod_ibi_phy_anfc_0.027deg-2D_PT15M-m",
-            "cmems_mod_ibi_phy_anfc_0.027deg-2D_PT1H-m",
-            "cmems_mod_ibi_phy_anfc_0.027deg-3D_P1D-m",
-            "cmems_mod_ibi_phy_anfc_0.027deg-3D_P1M-m",
-            "cmems_mod_ibi_phy_anfc_0.027deg-3D_PT1H-m",
-        ],
-        "waves": ["dataset-ibi-analysis-forecast-wav-005-005-hourly"],
-    },
-    "med": {
-        "physics": [
-            "med-cmcc-cur-an-fc-d",
-            "med-cmcc-cur-an-fc-h",
-            "med-cmcc-cur-an-fc-hts",
-            "med-cmcc-cur-an-fc-m",
-            "med-cmcc-cur-an-fc-qm",
-            "med-cmcc-mld-an-fc-d",
-            "med-cmcc-mld-an-fc-hts",
-            "med-cmcc-mld-an-fc-m",
-            "med-cmcc-sal-an-fc-d",
-            "med-cmcc-sal-an-fc-h",
-            "med-cmcc-sal-an-fc-hts",
-            "med-cmcc-sal-an-fc-m",
-            "med-cmcc-ssh-an-fc-d",
-            "med-cmcc-ssh-an-fc-hts",
-            "med-cmcc-ssh-an-fc-m",
-            "med-cmcc-ssh-an-fc-qm",
-            "med-cmcc-tem-an-fc-d",
-            "med-cmcc-tem-an-fc-h",
-            "med-cmcc-tem-an-fc-hts",
-            "med-cmcc-tem-an-fc-m",
-        ],
-        "waves": ["med-hcmr-wav-an-fc-h"],
-    },
-    "nws": {
-        "physics": [
-            "MetO-NWS-PHY-dm-TEM",
-            "MetO-NWS-PHY-hi-BED",
-            "MetO-NWS-PHY-hi-CUR",
-            "MetO-NWS-PHY-hi-MLD",
-            "MetO-NWS-PHY-hi-SAL",
-            "MetO-NWS-PHY-hi-SSC",
-            "MetO-NWS-PHY-hi-SSH",
-            "MetO-NWS-PHY-hi-SSS",
-            "MetO-NWS-PHY-hi-SST",
-            "MetO-NWS-PHY-hi-TEM",
-            "MetO-NWS-PHY-qh-SSC",
-            "MetO-NWS-PHY-qh-SSH",
-        ],
-        "waves": [
-            "MetO-NWS-WAV-hi",
-        ],
-    },
-    "bal": {
-        "physics": [
-            "dataset-bal-analysis-forecast-phy-15minutes",
-            "dataset-bal-analysis-forecast-phy-dailymeans",
-            "dataset-bal-analysis-forecast-phy-hourly",
-            "dataset-bal-analysis-forecast-phy-monthlymeans",
-        ],
-        "waves": [
-            "dataset-bal-analysis-forecast-wav-hourly",
-        ],
-    },
-    "blk": {
-        "physics": [
-            "bs-cmcc-cur-an-fc-d",
-            "bs-cmcc-cur-an-fc-h",
-            "bs-cmcc-cur-an-fc-m",
-            "bs-cmcc-mld-an-fc-d",
-            "bs-cmcc-mld-an-fc-h",
-            "bs-cmcc-mld-an-fc-m",
-            "bs-cmcc-sal-an-fc-d",
-            "bs-cmcc-sal-an-fc-h",
-            "bs-cmcc-sal-an-fc-m",
-            "bs-cmcc-sal-an-fc-m",
-            "bs-cmcc-sal-an-fc-m",
-            "bs-cmcc-ssh-an-fc-m",
-            "bs-cmcc-tem-an-fc-d",
-            "bs-cmcc-tem-an-fc-h",
-            "bs-cmcc-tem-an-fc-h",
-        ],
-        "waves": [
-            "cmems_mod_blk_wav_anfc_2.5km_PT1H-i",
-        ],
-    },
-    "arc": {
-        "physics": [
-            "dataset-topaz4-arc-1hr-myoceanv2-be",
-            "dataset-topaz4-arc-myoceanv2-be",
-        ],
-        "waves": ["dataset-wam-arctic-1hr3km-be"],
-    },
-}
+from metoceanproviders.exceptions import CredentialsError
 
 
 def _copernicusmarine_datastore(dataset, username, password):
@@ -164,6 +44,13 @@ def _copernicusmarine_datastore(dataset, username, password):
     return data_store
 
 
+# TODO - Extract class with shared methods and use heritage. shared methods:
+#           1. coord_standarization()
+#           2. crop()
+#           3. to_netcdf()
+#           4. to_daily_netcdf()
+
+
 class CmemsOpendap:
     def __init__(
         self,
@@ -177,51 +64,6 @@ class CmemsOpendap:
             dataset_id (str): Id-name of the dataset. Defaults to None.
             username (str, optional): Username to login in CMEMS service. Defaults to None.
             password (str, optional): Password to login in CMEMS service. Defaults to None.
-
-        Notes:
-            GLOBAL CURRENTS:  ["cmems_mod_glo_phy_anfc_merged-uv_PT1H-i",
-                              "global-analysis-forecast-phy-001-024",
-                              "global-analysis-forecast-phy-001-024-3dinst-so",
-                              "global-analysis-forecast-phy-001-024-3dinst-thetao",
-                              "global-analysis-forecast-phy-001-024-3dinst-uovo",
-                              "global-analysis-forecast-phy-001-024-hourly-t-u-v-ssh",
-                              "global-analysis-forecast-phy-001-024-monthly"]
-
-            GLOBAL WAVES: ["global-analysis-forecast-wav-001-0272"]
-
-            -----------------------------------------------------------------------------------
-
-            IBI CURRENTS: ["cmems_mod_ibi_phy_anfc_0.027deg-2D_PT15M-m",
-                          "cmems_mod_ibi_phy_anfc_0.027deg-2D_PT1H-m",
-                          "cmems_mod_ibi_phy_anfc_0.027deg-3D_P1D-m",
-                          "cmems_mod_ibi_phy_anfc_0.027deg-3D_P1M-m",
-                          "cmems_mod_ibi_phy_anfc_0.027deg-3D_PT1H-m"]
-
-            IBI WAVES: ["dataset-ibi-analysis-forecast-wav-005-005-hourly]
-
-            -----------------------------------------------------------------------------------
-
-            MED CURRENTS: ["med-cmcc-cur-an-fc-d",
-                          "med-cmcc-cur-an-fc-h",
-                          "med-cmcc-cur-an-fc-hts",
-                          "med-cmcc-cur-an-fc-m",
-                          "med-cmcc-cur-an-fc-qm",
-                          "med-cmcc-mld-an-fc-d",
-                          "med-cmcc-mld-an-fc-hts",
-                          "med-cmcc-mld-an-fc-m",
-                          "med-cmcc-sal-an-fc-d",
-                          "med-cmcc-sal-an-fc-h",
-                          "med-cmcc-sal-an-fc-hts",
-                          "med-cmcc-sal-an-fc-m",
-                          "med-cmcc-ssh-an-fc-d",
-                          "med-cmcc-ssh-an-fc-hts",
-                          "med-cmcc-ssh-an-fc-m",
-                          "med-cmcc-ssh-an-fc-qm",
-                          "med-cmcc-tem-an-fc-d",
-                          "med-cmcc-tem-an-fc-h",
-                          "med-cmcc-tem-an-fc-hts",
-                          "med-cmcc-tem-an-fc-m"]
-
 
         """
 
@@ -243,6 +85,8 @@ class CmemsOpendap:
             f"\n\033[1;32m'{username}' is successfully connected to '{dataset_id}'\033[0;0m\n"
         )
 
+        self.coords_standarization()
+
         # -----------------------------------------------------------------------
         # BUG - Repeted times! waiting response from cmems-service!
         # WORKARROUND - Check there are no repeted times, it there are drop them!
@@ -254,11 +98,11 @@ class CmemsOpendap:
             self.ds = self.ds.isel(time=index)
         # -----------------------------------------------------------------------
 
-        # STANDARIZE COORDINATES:
-        if "lon" in data.ds.coords:
-            data.ds = data.ds.rename({"lon": "longitude"})
-        if "lat" in data.ds.coords:
-            data.ds = data.ds.rename({"lat": "latitude"})
+    def coords_standarization(self):
+        if "lon" in self.ds.coords:
+            self.ds = self.ds.rename({"lon": "longitude"})
+        if "lat" in self.ds.coords:
+            self.ds = self.ds.rename({"lat": "latitude"})
 
     def crop(
         self,
@@ -373,6 +217,5 @@ class CmemsOpendap:
 
 
 if __name__ == "__main__":
-
     data = CmemsOpendap()
     print(data.ds)
