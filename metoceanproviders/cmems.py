@@ -195,7 +195,6 @@ class CmemsOpendap:
             output_path (str): path to the desired file.
             netcdf_format (str, optional): to specify the specific netcdf format, check availables in xarray documentation. Defaults to None.
         """
-        # output_path = os.path.abspath(output_path) #BUG delete hyphons
         try:
             self.ds.to_netcdf(output_path, format=netcdf_format)
             paths = list()
