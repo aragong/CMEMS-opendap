@@ -1,3 +1,5 @@
+"""Access to NOAA NOMADS[https://nomads.ncep.noaa.gov/] datasets"""
+
 import xarray as xr
 import pandas as pd
 from datetime import datetime, timedelta
