@@ -2,8 +2,8 @@ class DatasetNameError(Exception):
     """Custom error for invalid dataset"""
 
     def __init__(self, message, name=None):
-        self.message
-        self.dataset_name
+        self.message = message
+        self.dataset_name = name
         super().__init__(message)
 
 
