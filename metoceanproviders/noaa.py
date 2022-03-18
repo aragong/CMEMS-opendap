@@ -4,13 +4,29 @@ import xarray as xr
 import pandas as pd
 from datetime import datetime, timedelta
 
-from metoceanproviders.exceptions import DatasetNameError
+from exceptions import DatasetNameError
 
 # gfs_0p25_1hr_example = "http://nomads.ncep.noaa.gov:80/dods/gfs_0p25_1hr/gfs20220225/gfs_0p25_1hr_00z"
 # gfs_0p25_example = "http://nomads.ncep.noaa.gov:80/dods/gfs_0p25/gfs20220216/gfs_0p25_00z"
 
 
 class NoaaOpendap:
+    # TODO - refactor based on dataset dictionary
+    datasets = [
+        {
+            "name": "gfs_0p25",
+            "varaibles": ["ugrd10m", "vgrd10m", "vissfc"],
+            "spatial_resolution": 0.25,
+            "temporal_resolution": "3-hourly",
+        },
+        {
+            "name": "gfs_0p25_1hr",
+            "varaibles": ["ugrd10m", "vgrd10m", "vissfc"],
+            "spatial_resolution": 0.25,
+            "temporal_resolution": "hourly",
+        },
+    ]
+
     def __init__(self, dataset: str, extra_variables: list = []):
         """Access NOAA NOMADS Opendap service. Datasets:\n
         NOAA GFS 0.25º: winds@10m and visibility by default. https://nomads.ncep.noaa.gov/dods/gfs_0p25 \n
@@ -32,7 +48,9 @@ class NoaaOpendap:
                 # print(f"Triying to connect to '{urls[0]}'...\n")
                 self.ds = xr.open_dataset(urls[0])
                 if dataset == "gfs_0p25_1hr":
-                    self.ds = self.ds.get(["ugrd10m", "vgrd10m"] + extra_variables)
+                    self.ds = self.ds.get(
+                        ["ugrd10m", "vgrd10m", "vissfc"] + extra_variables
+                    )
                 elif dataset == "gfs_0p25":
                     self.ds = self.ds.get(
                         ["ugrd10m", "vgrd10m", "vissfc"] + extra_variables
@@ -72,4 +90,6 @@ class NoaaOpendap:
 
 
 if __name__ == "__main__":
-    data = NoaaOpendap(dataset="gfs_0p25")
+    data = NoaaOpendap(dataset="gfs_0p25_1hr")
+    print(NoaaOpendap.datasets)
+    print(data.ds)
