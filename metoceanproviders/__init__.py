@@ -12,8 +12,8 @@ import os
 
 from dotenv import load_dotenv
 
-from .cmems import CmemsOpendap, cmems_catalog
-
+from .cmems import CmemsOpendap
+from .noaa import NoaaOpendap
 
 dotenv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
 load_dotenv(dotenv_path)
