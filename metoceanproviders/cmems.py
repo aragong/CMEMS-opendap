@@ -8,8 +8,11 @@ from getpass import getpass
 import numpy as np
 import xarray as xr
 
-from metoceanproviders import config as cfg
 from metoceanproviders.exceptions import CredentialsError
+
+
+CMEMS_USERNAME = os.environ.get("CMEMS_USERNAME")
+CMEMS_PASSWORD = os.environ.get("CMEMS_PASSWORD")
 
 
 def _copernicusmarine_datastore(dataset, username, password):
@@ -55,8 +58,8 @@ class CmemsOpendap:
     def __init__(
         self,
         dataset_id: str = None,
-        username: str = cfg.CMEMS_USERNAME,
-        password: str = cfg.CMEMS_PASSWORD,
+        username: str = CMEMS_USERNAME,
+        password: str = CMEMS_PASSWORD,
     ):
         """Class to access CMEMS-dataset through Opendap service.
 
@@ -218,3 +221,5 @@ class CmemsOpendap:
 if __name__ == "__main__":
     data = CmemsOpendap()
     print(data.ds)
+
+

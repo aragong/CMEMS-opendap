@@ -23,10 +23,10 @@ dotenv set CMEMS_PASSWORD your_cmems_password
 ## :zap: Get Started
 
 ```python
-import metoceanproviders.cmems as cmems
+import metoceanproviders
 
 # EXAMPLE for accessing CMEMS opendap products
-data = cmems.Opendap(dataset_id, username, password)
+data = metoceanproviders.CmemsOpendap(dataset_id, username, password)
 
 data.ds # To visualize connected xarray dataset.
 data.crop(varaibles, times, longitudes, latitudes) # To crop dataset.

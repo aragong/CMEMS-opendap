@@ -4,12 +4,15 @@ from datetime import datetime, timedelta
 import pandas as pd
 import pytest
 import xarray as xr
-from metoceanproviders import config as cfg
 from metoceanproviders.cmems import (
     CredentialsError,
     CmemsOpendap,
     _copernicusmarine_datastore,
 )
+
+
+CMEMS_USERNAME = os.environ.get("CMEMS_USERNAME")
+CMEMS_PASSWORD = os.environ.get("CMEMS_PASSWORD")
 
 
 class TestLogin:
@@ -27,7 +30,7 @@ class TestLogin:
 
 
 credentials = pytest.mark.skipif(
-    None in [cfg.CMEMS_USERNAME, cfg.CMEMS_PASSWORD],
+    None in [CMEMS_USERNAME, CMEMS_PASSWORD],
     reason="\n\033[1;31m'CMEMS_USERNAME' and 'CMEMS_PASSWORD' environment variables are not defined. See Installation in README.md.\033[0;0m\n",
 )
 
@@ -48,7 +51,7 @@ class TestOpendap:
 
     @pytest.fixture(scope="class")
     def data(self, times, longitudes, latitudes):
-        data = CmemsOpendap("cmems_mod_glo_phy_anfc_merged-uv_PT1H-i")
+        data = CmemsOpendap("cmems_mod_glo_phy_anfc_merged-uv_PT1H-i",username=CMEMS_USERNAME, password=CMEMS_PASSWORD)
         data.crop(None, times, longitudes, latitudes)
         return data
 

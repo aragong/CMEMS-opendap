@@ -4,7 +4,7 @@ import xarray as xr
 import pandas as pd
 from datetime import datetime, timedelta
 
-from exceptions import DatasetNameError
+from metoceanproviders.exceptions import DatasetNameError
 
 # gfs_0p25_1hr_example = "http://nomads.ncep.noaa.gov:80/dods/gfs_0p25_1hr/gfs20220225/gfs_0p25_1hr_00z"
 # gfs_0p25_example = "http://nomads.ncep.noaa.gov:80/dods/gfs_0p25/gfs20220216/gfs_0p25_00z"

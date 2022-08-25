@@ -11,8 +11,6 @@ dependencies:
   - lxml
   - pydap
   - scipy
-
-# DEV-PACKAGES
   - python-dotenv
   - flit
   - pytest-cov
