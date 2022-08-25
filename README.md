@@ -30,7 +30,7 @@ dotenv set CMEMS_PASSWORD your_cmems_password
 import metoceanproviders
 
 dataset_id = "cmems_dataset_string_id"
-username = "your_cmems_user_name"
+username = "your_cmems_username"
 password = "your_cmems_password"
 
 # EXAMPLE for accessing CMEMS opendap products
