@@ -57,7 +57,7 @@ def _copernicusmarine_datastore(dataset, username, password):
 class CmemsOpendap:
     def __init__(
         self,
-        dataset_id: str = None,
+        dataset_id: str,
         username: str = CMEMS_USERNAME,
         password: str = CMEMS_PASSWORD,
     ):
@@ -74,12 +74,12 @@ class CmemsOpendap:
         self.password = password
         self.dataset_id = dataset_id.lstrip().rstrip()
 
-        if not self.dataset_id:
-            self.dataset_id = input("Enter dataset-id form CMEMS-Opendap service: ")
-        if not self.username:
-            self.username = getpass("Enter your username: ")
-        if not self.password:
-            self.password = getpass("Enter your password: ")
+        # if not self.dataset_id:
+        #     self.dataset_id = input("Enter dataset-id form CMEMS-Opendap service: ")
+        # if not self.username:
+        #     self.username = getpass("Enter your username: ")
+        # if not self.password:
+        #     self.password = getpass("Enter your password: ")
 
         # Connect to datastore
         data_store = _copernicusmarine_datastore(dataset_id, username, password)
