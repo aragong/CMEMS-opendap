@@ -3,7 +3,6 @@ you will need to be registered and use your credentials"""
 
 import os
 from datetime import datetime
-from getpass import getpass
 
 import numpy as np
 import xarray as xr
@@ -41,13 +40,6 @@ def _copernicusmarine_datastore(dataset, username, password):
         url = f"https://{database[1]}.cmems-du.eu/thredds/dodsC/{dataset}"
         data_store = xr.backends.PydapDataStore(open_url(url, session=session))
     return data_store
-
-
-# TODO - Extract class with shared methods and use heritage. shared methods:
-#           1. coord_standarization()
-#           2. crop()
-#           3. to_netcdf()
-#           4. to_daily_netcdf()
 
 
 class CmemsOpendap:
