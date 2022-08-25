@@ -12,9 +12,13 @@ Python package to access main open-access met-ocean products (Forecast, Reanalys
 ---
 ## :house: Installation
 ```bash
-pip install git+ssh://git@github.com/aragong/metoceanproviders.git@v0.1.0
-
-# Declare CMEMS_USERNAME and CMEMS_PASSWORD variables inside your .env file
+pip install git+ssh://git@github.com/aragong/metoceanproviders.git@v0.2.0
+```
+---
+## :heavy_check_mark: Run tests
+```bash 
+# Declare a ".env" file with "CMEMS_USERNAME" and "CMEMS_PASSWORD" variables is needed. 
+# You can do it directly using dotenv cli commands in bash or create the file manually:
 dotenv set CMEMS_USERNAME your_cmems_username
 dotenv set CMEMS_PASSWORD your_cmems_password
 ```
@@ -25,12 +29,21 @@ dotenv set CMEMS_PASSWORD your_cmems_password
 ```python
 import metoceanproviders
 
+dataset_id = "cmems_dataset_string_id"
+username = "your_cmems_user_name"
+password = "your_cmems_password"
+
 # EXAMPLE for accessing CMEMS opendap products
 data = metoceanproviders.CmemsOpendap(dataset_id, username, password)
 
-data.ds # To visualize connected xarray dataset.
-data.crop(varaibles, times, longitudes, latitudes) # To crop dataset.
-data.to_netcdf(output_path) # To download to NetCDF-file.
+# To visualize connected xarray dataset.
+data.ds 
+
+# To crop dataset.
+data.crop(varaibles, times, longitudes, latitudes) 
+
+# To download to NetCDF-file (daily files if the size not allowwed by the server)
+data.to_netcdf(output_path)
 ```
 
 ---

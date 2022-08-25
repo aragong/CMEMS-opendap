@@ -10,6 +10,8 @@ from metoceanproviders.cmems import (
     _copernicusmarine_datastore,
 )
 
+from dotenv import load_dotenv
+load_dotenv(".env")
 
 CMEMS_USERNAME = os.environ.get("CMEMS_USERNAME")
 CMEMS_PASSWORD = os.environ.get("CMEMS_PASSWORD")

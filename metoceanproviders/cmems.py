@@ -11,10 +11,6 @@ import xarray as xr
 from metoceanproviders.exceptions import CredentialsError
 
 
-CMEMS_USERNAME = os.environ.get("CMEMS_USERNAME")
-CMEMS_PASSWORD = os.environ.get("CMEMS_PASSWORD")
-
-
 def _copernicusmarine_datastore(dataset, username, password):
     __author__ = "Copernicus Marine User Support Team"
     __copyright__ = "(C) 2021 E.U. Copernicus Marine Service Information"
@@ -58,8 +54,8 @@ class CmemsOpendap:
     def __init__(
         self,
         dataset_id: str,
-        username: str = CMEMS_USERNAME,
-        password: str = CMEMS_PASSWORD,
+        username: str,
+        password: str,
     ):
         """Class to access CMEMS-dataset through Opendap service.
 
@@ -73,13 +69,6 @@ class CmemsOpendap:
         self.username = username
         self.password = password
         self.dataset_id = dataset_id.lstrip().rstrip()
-
-        # if not self.dataset_id:
-        #     self.dataset_id = input("Enter dataset-id form CMEMS-Opendap service: ")
-        # if not self.username:
-        #     self.username = getpass("Enter your username: ")
-        # if not self.password:
-        #     self.password = getpass("Enter your password: ")
 
         # Connect to datastore
         data_store = _copernicusmarine_datastore(dataset_id, username, password)
@@ -221,5 +210,3 @@ class CmemsOpendap:
 if __name__ == "__main__":
     data = CmemsOpendap()
     print(data.ds)
-
-
