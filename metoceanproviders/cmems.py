@@ -71,17 +71,6 @@ class CmemsOpendap:
 
         self.coords_standarization()
 
-        # -----------------------------------------------------------------------
-        # BUG - Repeted times! waiting response from cmems-service!
-        # WORKARROUND - Check there are no repeted times, it there are drop them!
-        if len(np.unique(self.ds.time.values)) != len(self.ds.time):
-            print(
-                "\n\033[1;31mRepeated times founded! --> report to CMEMS - Elena: 'edimedio@mercator-ocean.eu'\033[0;0m\n"
-            )
-            _, index = np.unique(self.ds["time"], return_index=True)
-            self.ds = self.ds.isel(time=index)
-        # -----------------------------------------------------------------------
-
     def coords_standarization(self):
         if "lon" in self.ds.coords:
             self.ds = self.ds.rename({"lon": "longitude"})
